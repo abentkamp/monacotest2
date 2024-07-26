@@ -1,7 +1,7 @@
 import 'vscode/localExtensionHost'
 import { RegisterExtensionResult, WebSocketConfigOptionsUrl } from 'monaco-editor-wrapper';
 import { LeanClientProvider } from './monaco-lean4/vscode-lean4/src/utils/clientProvider';
-import { Uri } from 'vscode';
+import { Uri, workspace } from 'vscode';
 import { InfoProvider } from './monaco-lean4/vscode-lean4/src/infoview';
 import { AbbreviationFeature } from './monaco-lean4/vscode-lean4/src/abbreviation/AbbreviationFeature';
 import { LeanTaskGutter } from './monaco-lean4/vscode-lean4/src/taskgutter';
@@ -117,6 +117,8 @@ export class LeanMonaco {
 
     if (this.disposed) return;
 
+    this.updateVSCodeOptions(options.vscode ?? {})
+
     this.abbreviationFeature = new AbbreviationFeature({} as any, { kind: 'MoveAllSelections' });
   
     this.clientProvider = new LeanClientProvider(
@@ -153,9 +155,9 @@ export class LeanMonaco {
   }
 
   updateVSCodeOptions(vsCodeOptions: { [id: string]: any }){
-    updateUserConfiguration(JSON.stringify({
-      "[lean4]": vsCodeOptions
-    }))
+    for (const key in vsCodeOptions) {
+        workspace.getConfiguration().update(key, vsCodeOptions[key])
+    }
   }
 
   setInfoviewElement(infoviewEl: HTMLElement){
@@ -224,7 +226,6 @@ export class LeanMonaco {
           }
         ],
         "configurationDefaults": {
-          "[lean4]": {
             "editor.folding": false,
             "editor.wordSeparators": "`~@$%^&*()-=+[{]}⟨⟩⦃⦄⟦⟧⟮⟯‹›\\|;:\",.<>/",
             "editor.lineNumbers": 'on',
@@ -241,9 +242,7 @@ export class LeanMonaco {
             "editor.acceptSuggestionOnEnter": "off",
             "editor.fontFamily": "JuliaMono",
             "editor.wrappingStrategy": "advanced",
-            "editor.theme": "Visual Studio Light", //"Cobalt" // "Visual Studio Light" //"Visual Studio Dark" //"Default Light Modern" //"Default Light+" //"Default Dark+" //"Default High Contrast"
-          }
-        },
+          },
         "themes": [
           {
               "id": "Cobalt",
