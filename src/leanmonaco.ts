@@ -19,7 +19,6 @@ import { ExtensionHostKind, IExtensionManifest, registerExtension } from 'vscode
 import { DisposableStore } from 'vscode/monaco';
 import packageJson from './monaco-lean4/vscode-lean4/package.json'
 
-
 export type LeanMonacoOptions = {
   websocket: {
     url: string
